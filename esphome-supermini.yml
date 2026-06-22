@@ -75,9 +75,18 @@ uart:
     parity: NONE
     stop_bits: 2
 
+time:
+  - platform: homeassistant
+    id: homeassistant_time
+    # Push the correct time to the Truma CP Plus clock on every sync
+    on_time_sync:
+      then:
+        - truma_inetbox.clock.set:
+
 truma_inetbox:
   uart_id: lin_uart_bus
   lin_checksum: VERSION_2
+  time_id: homeassistant_time
 
 # ─── Onboard RGB LED state machine ───────────────────────────────────────────
 # Green flash (every 2 s):  CP Plus connected – LIN bus active
@@ -364,6 +373,38 @@ number:
     name: "Electric Power Level"
     type: ELECTRIC_POWER_LEVEL
 
+  - platform: template
+    name: "Timer Room Temperature"
+    id: timer_room_temperature
+    optimistic: true
+    restore_value: true
+    min_value: 5
+    max_value: 30
+    step: 1
+    initial_value: 19
+    unit_of_measurement: "°C"
+    mode: box
+    entity_category: config
+
+datetime:
+  - platform: template
+    name: "Timer Start"
+    id: timer_start
+    type: time
+    optimistic: true
+    restore_value: true
+    initial_value: "07:00:00"
+    entity_category: config
+
+  - platform: template
+    name: "Timer Stop"
+    id: timer_stop
+    type: time
+    optimistic: true
+    restore_value: true
+    initial_value: "09:30:00"
+    entity_category: config
+
 switch:
   - platform: template
     name: "Activate Room Heater"
@@ -405,15 +446,15 @@ switch:
       - truma_inetbox.heater.set_target_water_temperature_enum: "OFF"
 
   - platform: template
-    name: "Active Timer"
+    name: "Activate Timer"
     lambda: |-
       return id(TIMER_ACTIVE).state;
     turn_on_action:
       - lambda: 'id(led_color) = 2; id(led_ticks) = 3;'
       - truma_inetbox.timer.activate:
-          start: 7:00
-          stop: 9:30
-          room_temperature: 13
+          start: !lambda 'return id(timer_start).hour * 60 + id(timer_start).minute;'
+          stop: !lambda 'return id(timer_stop).hour * 60 + id(timer_stop).minute;'
+          room_temperature: !lambda 'return (int) id(timer_room_temperature).state;'
           heating_mode: ECO
           water_temperature: 0
           energy_mix: GAS
