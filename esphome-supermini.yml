@@ -1,6 +1,7 @@
 esphome:
   name: esp32-c6-3-supermini
   friendly_name: Bobil ESP32C6 Truma
+  min_version: "2026.5.3"
 
 external_components:
   - source:
