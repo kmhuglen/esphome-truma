@@ -18,8 +18,20 @@ esp32:
     version: recommended
 
 logger:
-  level: DEBUG
+  # Global level is the ceiling for per-tag levels, so it must be VERY_VERBOSE
+  # for the LIN tag below to emit VERY_VERBOSE output.
+  level: VERY_VERBOSE
   baud_rate: 115200
+  logs:
+    # Show every raw LIN frame the ESP receives (RX-path / bus diagnostics)
+    truma_inetbox.LinBusListener: VERY_VERBOSE
+    # Quiet the noisy subsystems so the LIN traffic stays readable
+    esp32_ble: INFO
+    esp32_ble_tracker: INFO
+    esp32_ble_client: INFO
+    bluetooth_proxy: INFO
+    wifi: INFO
+    sensor: INFO
 
 debug:
   update_interval: 10s
@@ -87,6 +99,10 @@ truma_inetbox:
   uart_id: lin_uart_bus
   lin_checksum: VERSION_2
   time_id: homeassistant_time
+  # Record the time of every valid frame received from the heater (RX/link health)
+  on_heater_message:
+    then:
+      - lambda: 'id(truma_last_contact) = millis();'
 
 # ─── Onboard RGB LED state machine ───────────────────────────────────────────
 # Green flash (every 2 s):  CP Plus connected – LIN bus active
@@ -106,6 +122,10 @@ globals:
     type: bool
     restore_value: no
     initial_value: 'false'
+  - id: truma_last_contact  # millis() of last received Truma frame (0 = none since boot)
+    type: uint32_t
+    restore_value: no
+    initial_value: '0'
 
 interval:
   - interval: 2s        # Status: green = CP Plus alive, red = no Wi-Fi
@@ -198,6 +218,19 @@ sensor:
   - platform: truma_inetbox
     name: "Heater Error Code"
     type: HEATER_ERROR_CODE
+
+  - platform: template
+    name: "Truma Time Since Contact"
+    id: truma_time_since_contact
+    unit_of_measurement: "s"
+    accuracy_decimals: 0
+    update_interval: 5s
+    device_class: duration
+    state_class: measurement
+    entity_category: diagnostic
+    lambda: |-
+      if (id(truma_last_contact) == 0) return 9999.0;  // no frame received since boot
+      return (millis() - id(truma_last_contact)) / 1000.0;
 
 button:
   - platform: restart
