@@ -74,15 +74,15 @@ uart:
     data_bits: 8
     parity: NONE
     stop_bits: 2
-    # Raw byte tap for LIN diagnostics (logs at DEBUG; remove when done)
-    debug:
-      direction: BOTH
-      dummy_receiver: false
-      after:
-        bytes: 16
-        timeout: 100ms
-      sequence:
-        - lambda: UARTDebug::log_hex(direction, bytes, ':');
+    # Raw byte tap for LIN diagnostics — uncomment to dump raw RX/TX hex
+    # debug:
+    #   direction: BOTH
+    #   dummy_receiver: false
+    #   after:
+    #     bytes: 16
+    #     timeout: 100ms
+    #   sequence:
+    #     - lambda: UARTDebug::log_hex(direction, bytes, ':');
 
 time:
   - platform: homeassistant
