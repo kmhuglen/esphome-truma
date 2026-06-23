@@ -21,8 +21,13 @@ RV Power (Black) <-> LIN BUS GND | Black wire (screw)
 RV Power (Red) <-> LIN BUS 12V | Red wire (screw)
 Truma RJ12 PIN4 <-> LIN BUS LIN | Yellow wire (screw)
 ESP32 GPIO-7 (TX) <-> LIN BUS RX | Blue wire (soldered on ESP32)
-ESP32 GPIO-6 (RX) <-> LIN BUS TX | Green wire (soldered on ESP32)
+LIN BUS TX <-> R1 (10 kΩ series) <-> ESP32 GPIO-6 (RX) | Green wire (soldered on ESP32), via 10 kΩ
+ESP32 GPIO-6 (RX) <-> R2 (20 kΩ) <-> ESP32 GND | Voltage-divider lower leg (20 kΩ to GND)
 ESP32 GND <-> LIN BUS GND | Black wire (soldered on ESP32)
+
+> **⚠️ Level shifting required on LIN BUS TX → GPIO-6.**
+> The UART-to-LIN module's TX output is **5 V** logic (TJA1021/SIT1021T, no VIO pin), but the ESP32-C6 GPIOs are **3.3 V and not 5 V tolerant** (abs. max ~3.6 V). Driving GPIO-6 directly with 5 V will damage the pin over time (it killed RX on my first build after ~1 week).
+> A resistor divider on the green wire brings it down: **LIN TX → 10 kΩ (R1) → GPIO-6**, and **GPIO-6 → 20 kΩ (R2) → GND**, giving ≈ 3.0–3.3 V at GPIO-6 (idle measured ~2.45–2.90 V with bus traffic). The 10 kΩ/20 kΩ values keep the load light enough for the module's weak TX to pull the line high. The ESP TX → module RX direction (blue wire) needs no shifting — the module accepts 3.3 V input.
 
 ## Hardware
 
@@ -34,6 +39,7 @@ UART to LIN Bus Module | [AliExpress](https://www.aliexpress.com/item/1005008499
 ESP32-C6 SuperMini | [AliExpress](https://www.aliexpress.com/item/1005007676682081.html) | <img src="images/esp32-c6-supermini.avif" alt="ESP32-C6 SuperMini" width="500" />
 12V/24V DC-DC Step Down Module USB-C | [AliExpress](https://www.aliexpress.com/item/1005007820939213.html) | <img src="images/dc-dc-adapter.avif" alt="12V/24V to 5V adapter" width="500" />
 RJ12 6P6C Female Plug-In Terminal Connector | [AliExpress](https://www.aliexpress.com/item/1005009539648208.html) | <img src="images/rj12-adapter.avif" alt="RJ12 adapter" width="500" />
+Resistors 10 kΩ + 20 kΩ (¼ W) for LIN TX → GPIO-6 level divider | Any electronics kit | —
 
 ## Home Assistant Dashboard
 
