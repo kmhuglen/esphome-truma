@@ -14,7 +14,9 @@ The configuration is based on https://github.com/havanti/esphome-truma and adapt
 
 | PIN to PIN | Wire |
 | --- | --- |
-DC/DC Converter USB-C <-> ESP32 USB-C | USB Cable
+Vehicle 12V Supply <-> DC/DC Converter USB-C | Red(12V) and Black(GND) wire 
+DC/DC Converter USB-C <-> Wifi Router | USB-C to USB-C Cable 
+Wifi Router <-> ESP32 USB-C | USB-A to USB-C Cable 
 DC/DC Converter - (Black) <-> LIN BUS GND | Black wire (screw)
 DC/DC Converter + (Red) <-> LIN BUS 12V | Red wire (screw)
 RV Power (Black) <-> LIN BUS GND | Black wire (screw)
@@ -33,6 +35,7 @@ ESP32 GND <-> LIN BUS GND | Black wire (soldered on ESP32)
 
 | Device | Shop | Picture |
 | --- | --- | --- |
+GL.iNet GL-E750V2 (MUDI) 4G LTE Portable Wi-Fi Hotspot for Travel | [Amazon](https://www.amazon.com/GL-iNet-GL-E750V2-OpenWrt-T-Mobile-WireGuard/dp/B0CJF7KQ3Q) | <img src="images/GL-E750V2.jpg" alt="GL.iNet GL-E750V2 (MUDI) 4G LTE Portable Wi-Fi Hotspot for Travel" width="500" />
 ISDN T-Adapter RJ12 female (6P6C) | [BatteriOnline](https://www.batterionline.no/kabler-tilslutning/datakabler/internett-pc-stromkabler/isdn/isdn-t-adapter-rj12-hun-6p6c-1-pcs) | <img src="images/isdn-t-adapter-1.jpg" alt="ISDN T-Adapter image 1" width="500" /><br><img src="images/isdn-t-adapter-2.jpg" alt="ISDN T-Adapter image 2" width="500" />
 RJ12 Cable 2x RJ12 male (6P6C) | [BatteriOnline](https://www.batterionline.no/kabler-tilslutning/diverse-kabler/telefonledninger/skjoteledning-6p6c/telefon-forlengerkabel-2x-rj12-han-6p6c-3m) | <img src="images/telefon-forlengerkabel.jpg" alt="RJ12 Cable" width="500" />
 UART to LIN Bus Module | [AliExpress](https://www.aliexpress.com/item/1005008499687135.html) | <img src="images/usb-lin-module.avif" alt="USB to LIN Bus Module" width="500" />
